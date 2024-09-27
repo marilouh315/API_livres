@@ -1,4 +1,4 @@
-const sql = require("../config/db");
+const sql = require("../config/db_pg");
 
 const Livres = (livres) => {}
 
@@ -9,7 +9,7 @@ const Livres = (livres) => {}
  */
 Livres.verifierExistenceISBN = (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `select count(*) as count_isbn from Livre l where l.ISBN = ?`;
+        const requete = `select count(*) as count_isbn from Livre l where l.ISBN = $1`;
         const param_ISBN = [ISBN];
         sql.query(requete, param_ISBN, (err, resultats) => {
             if (err) {
@@ -17,7 +17,7 @@ Livres.verifierExistenceISBN = (ISBN) => {
                 return;
             }
             else {
-                resolve(resultats[0].count_isbn > 0);
+                resolve(resultats.rows[0].count_isbn > 0);
             }
         });
     });
@@ -30,7 +30,7 @@ Livres.verifierExistenceISBN = (ISBN) => {
  */
 Livres.verifierISBNBibli = (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `select count(*) as count_isbn from bibliotheque b where b.id_livre = ?`;
+        const requete = `select count(*) as count_isbn from bibliotheque b where b.id_livre = $1`;
         const param_ISBN = [ISBN];
 
         sql.query(requete, param_ISBN, (err, resultats) => {
@@ -39,7 +39,7 @@ Livres.verifierISBNBibli = (ISBN) => {
                 return;
             }
             else {
-                resolve(resultats[0].count_isbn > 0);
+                resolve(resultats.rows[0].count_isbn > 0);
             }
         });
     })
@@ -52,7 +52,7 @@ Livres.verifierISBNBibli = (ISBN) => {
  */
 Livres.verifierAppreciation = (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `select count(*) as count_appreciation from appreciation a where a.id_livre = ?`;
+        const requete = `select count(*) as count_appreciation from appreciation a where a.id_livre = $1`;
         const param_ISBN = [ISBN];
 
         sql.query(requete, param_ISBN, (err, resultats) => {
@@ -62,7 +62,7 @@ Livres.verifierAppreciation = (ISBN) => {
             }
             else {
                 console.log("Resultat count appreciation", resultats[0].count_appreciation);
-                resolve(resultats[0].count_appreciation > 0);
+                resolve(resultats.rows[0].count_appreciation > 0);
             }
         });
     })
@@ -75,7 +75,7 @@ Livres.verifierAppreciation = (ISBN) => {
  */
 Livres.verifieStatutLivre = (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `select statut_livre from Livre l where l.ISBN = ?`;
+        const requete = `select statut_livre from Livre l where l.ISBN = $1`;
         const param_ISBN = [ISBN];
 
         sql.query(requete, param_ISBN, (err, resultats) => {
@@ -85,7 +85,7 @@ Livres.verifieStatutLivre = (ISBN) => {
             }
             else {
                 console.log("Resultat statut livre", resultats[0].statut_livre);
-                resolve(resultats[0].statut_livre);
+                resolve(resultats.rows[0].statut_livre);
             }
         });
     })
@@ -111,7 +111,7 @@ Livres.afficherTousLivres = async () => {
                 reject(err);
             }
             else {
-                resolve(resultats);
+                resolve(resultats.rows);
             }
         });
     })
@@ -128,7 +128,7 @@ Livres.afficherDetailsLivre = async (ISBN) => {
         `select l.ISBN, l.titre, l.auteur, g.nom_genre, l.date_publication, l.nbre_pages, l.photo_URL, l.statut_livre, t.nom_genre, l.is_favoris from Genre g
             inner join Livre l on g.id_genre = l.genre_id
             inner join Type_livre t on l.type_livre_id = t.id_type_livre 
-            where l.ISBN = 9780143128540`;
+            where l.ISBN = $1`;
         const param_ISBN = [ISBN];
 
         sql.query(requete, param_ISBN, (erreur, resultat) => {
@@ -136,7 +136,7 @@ Livres.afficherDetailsLivre = async (ISBN) => {
                 reject(erreur);
             }
             else {
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })
@@ -157,7 +157,7 @@ Livres.afficherBibli = async => {
                 reject(erreur);
             }
             else {
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })
@@ -170,7 +170,7 @@ Livres.afficherBibli = async => {
  */
 Livres.ajouterLivreBibli = async (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `insert into Bibliotheque(id_livre) values (?)`;
+        const requete = `insert into Bibliotheque(id_livre) values ($1)`;
         const param_ISBN = [ISBN];
         sql.query(requete, param_ISBN, (erreur, resultat) => {
             if (erreur) {
@@ -178,7 +178,7 @@ Livres.ajouterLivreBibli = async (ISBN) => {
             }
             else {
                 console.log("Resultat livre", resultat)
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })
@@ -191,14 +191,14 @@ Livres.ajouterLivreBibli = async (ISBN) => {
  */
 Livres.retirerLivreBibli = async (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `delete from bibliotheque b where b.id_livre = ?`;
+        const requete = `delete from bibliotheque b where b.id_livre = $1`;
         const param_ISBN = [ISBN];
         sql.query(requete, param_ISBN, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }
             else {
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })
@@ -217,7 +217,7 @@ Livres.afficherFavoris = async ()=> {
                 reject(erreur);
             }
             else {
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })
@@ -232,7 +232,7 @@ Livres.afficherAppreciation = async (ISBN) => {
     return new Promise((resolve, reject) => {
         const requete = `select l.ISBN, l.titre, l.auteur, a.titre_appreciation, a.commentaire, a.etoiles from livre l 
             inner join appreciation a on l.ISBN = a.id_livre
-            where l.ISBN = ?`;
+            where l.ISBN = $1`;
         const param_ISBN = [ISBN];
 
         sql.query(requete, param_ISBN, (erreur, resultat) => {
@@ -240,7 +240,7 @@ Livres.afficherAppreciation = async (ISBN) => {
                 reject(erreur);
             }
             else {
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })
@@ -256,7 +256,7 @@ Livres.afficherAppreciation = async (ISBN) => {
  */
 Livres.ajouterAppreciation = async (titre_appreciation, commentaire, nbre_etoiles, isbn) => {
     return new Promise((resolve, reject) => {
-        const requete = `INSERT INTO Appreciation (titre_appreciation, commentaire, etoiles, id_livre) VALUES (?, ?, ?, ?)`;
+        const requete = `INSERT INTO Appreciation (titre_appreciation, commentaire, etoiles, id_livre) VALUES ($1, $2, $3, $4)`;
         const params = [titre_appreciation, commentaire, nbre_etoiles, isbn];
 
         sql.query(requete, params, (erreur, resultat) => {
@@ -265,7 +265,7 @@ Livres.ajouterAppreciation = async (titre_appreciation, commentaire, nbre_etoile
             }
             else {
                 console.log("Resultat appreciation", resultat);
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     }) 
@@ -279,7 +279,7 @@ Livres.ajouterAppreciation = async (titre_appreciation, commentaire, nbre_etoile
  */
 Livres.modifierStatutLivre = async (statut, ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `UPDATE Livre SET statut_livre = ? WHERE ISBN = ?`;
+        const requete = `UPDATE Livre SET statut_livre = $1 WHERE ISBN = $1`;
         const params = [statut, ISBN];
 
         sql.query(requete, params, (erreur, resultat) => {
@@ -287,7 +287,7 @@ Livres.modifierStatutLivre = async (statut, ISBN) => {
                 reject(erreur);
             }
             else {
-                resolve(resultat);
+                resolve(resultat.rows);
             }
         })
     })

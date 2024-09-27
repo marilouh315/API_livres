@@ -2,6 +2,9 @@ const mysql = require("mysql2");
 const dotenv = require("dotenv");
 dotenv.config();
 
+const { Client } = require("pg");
+
+
 const pool = mysql.createPool({
     connectionLimit: process.env.MYSQL_CONNECTION_LIMIT,
     host: process.env.MYSQL_HOST,
