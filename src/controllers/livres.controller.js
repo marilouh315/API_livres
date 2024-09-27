@@ -582,3 +582,199 @@ exports.modifierStatutLivre = (req, res) => {
         });
     });
 }
+
+exports.ajouterLivre = (req, res) => {
+    const {
+        ISBN, 
+        titre, 
+        auteur, 
+        genre_id, 
+        date_publication, 
+        nbre_pages, 
+        photo_URL, 
+        type_livre_id, 
+    } = req.body;
+
+    const champsManquants = [];
+
+    const isbnRegex = /^\d{13}$/;
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+    //Vérification de l'ISBN
+    if (!ISBN || ISBN <= 0 || isNaN(ISBN) || ISBN == undefined || !isbnRegex.test(ISBN)) {
+        res.status(400).json({
+            erreur: `Erreur des données.`,
+            message: `L'ISBN est invalide. Il doit être un nombre de 13 chiffres exactement.`,
+            format: `Exemple : 9781234567890`,
+            champs_manquants: ["ISBN"]
+        });
+        champsManquants.push("ISBN");
+        return;
+    }
+
+    // Vérification du titre
+    if (!titre || titre.length < 1 || titre.length > 100) {
+        res.status(400).json({
+            erreur: `Erreur des données.`,
+            message: `Le titre est invalide. Il doit contenir entre 1 et 100 caractères.`,
+            format: `Exemple : Titre du livre`,
+            champs_manquants: ["titre"]
+        });
+        champsManquants.push("titre");
+        return;
+    }
+
+    // Vérification de l'auteur
+    if (!auteur || auteur.length < 3 || auteur.length > 100) {
+        res.status(400).json({
+            erreur: `Erreur des données.`,
+            message: `L'auteur est invalide. Il doit contenir entre 3 et 100 caractères.`,
+            format: `Exemple : John Doe`,
+            champs_manquants: ["auteur"]
+        });
+        champsManquants.push("auteur");
+        return;
+    }
+    
+    // Vérification du genre_id
+    livresModel.verifierExistenceGenre(genre_id)
+    .then((genre_existe) => {
+        if (!genre_id){
+            champsManquants.push("genre_id");
+        }
+        else if (genre_existe <= 0 || !genre_existe) {
+            res.status(404).json;
+            res.send({
+                erreur: `Données non trouvées.`,
+                message: `Le genre avec l'ID ${genre_id} n'existe pas dans la base de données.`,
+                genres_possibles : 
+                `1: Fiction,
+                2: Romance,
+                3: Fantaisie,
+                4: Horreur,
+                5: Science-fiction,
+                6: Biographie,
+                7: Poésie,
+                8: Mystère,
+                9: Action,
+                10: Policier,
+                11: Psychologique,
+                12: Informations`
+            })
+            return;
+        }
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500).json
+        res.send({
+            erreur: `Erreur serveur`,
+            message: "Erreur lors de la vérification du genre."
+        });
+    });
+
+    // Vérification de la date de publication (format YYYY-MM-DD)
+    if (!date_publication || !dateRegex.test(date_publication)) {
+        res.status(400).json({
+            erreur: `Erreur des données.`,
+            message: `La date de publication est invalide. Elle doit être au format 'YYYY-MM-DD'.`,
+            format: `Exemple : 2023-09-19`,
+            champs_manquants: ["date_publication"]
+        });
+        champsManquants.push("date_publication");
+        return;
+    }
+
+    // Vérification du nombre de pages (doit être un nombre positif)
+    if (!nbre_pages || isNaN(nbre_pages) || nbre_pages <= 0) {
+        res.status(400).json({
+            erreur: `Erreur des données.`,
+            message: `Le nombre de pages est invalide. Il doit être un nombre entier positif.`,
+            format: `Exemple : 324`,
+            champs_manquants: ["nbre_pages"]
+        });
+        champsManquants.push("nbre_pages");
+        return;
+    }
+
+    // Vérification de l'URL de la photo
+    if (!photo_URL) champsManquants.push("photo_URL");
+
+    // Vérification du type du livre
+    livresModel.verifierExistenceTypeLivre(type_livre_id)
+    .then((type_existe) => {
+        if (!type_livre_id){
+            champsManquants.push("type_livre_id");
+        }
+        else if (type_existe <= 0 || !type_existe) {
+            res.status(404).json;
+            res.send({
+                erreur: `Données non trouvées.`,
+                message: `Le type de livre avec l'ID ${type_livre_id} n'existe pas dans la base de données.`,
+                types_possibles : 
+                `1 Roman,
+                2 Essai,
+                3 Nouvelle,
+                4 Bande-déssinée,
+                5 Manga,
+                6 Enfants,
+                7 Manuel scolaire,
+                8 Encyclopédie`
+            })
+            return;
+        }
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500).json
+        res.send({
+            erreur: `Erreur serveur`,
+            message: "Erreur lors de la vérification du type de livre."
+        });
+    });
+
+    if (champsManquants.length > 0) {
+        return res.status(400).json({
+            erreur: `Donnée(s) non valide(s).`,
+            message: `Le format des données est invalide.`,
+            champs_manquants: champsManquants
+        });
+    }
+
+/***FIN DES VALIDATIONS**************************************************************************** */
+
+    livresModel.ajouterLivre(ISBN, titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id)
+    .then((livre_ajoute) => {
+        if (!livre_ajoute) {
+            res.status(404).json;
+            res.send({
+                erreur: `Données non trouvées.`,
+                message: `Le livre n'a pas pu être ajouté.`
+            })
+            return;
+        }
+        else {
+            res.status(200).json({
+                message: `Le livre a été ajouté avec succès!`,
+                livre_ajoute: {
+                    ISBN: ISBN,
+                    titre: titre,
+                    auteur: auteur,
+                    genre_id: genre_id,
+                    date_publication: date_publication,
+                    nbre_pages: nbre_pages,
+                    photo_URL: photo_URL,
+                    type_livre_id: type_livre_id
+                }
+            });
+        }
+    })
+    .catch((erreur) => {
+        console.log('Erreur : ', erreur);
+        res.status(500).json
+        res.send({
+            erreur: `Erreur serveur`,
+            message: "Erreur lors de l'ajout du livre."
+        });
+    });
+}

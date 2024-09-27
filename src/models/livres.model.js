@@ -91,6 +91,52 @@ Livres.verifieStatutLivre = (ISBN) => {
     })
 }
 
+/**
+ * Vérifie l'existence d'un genre dans la base de données
+ * @param {*} genre_id Genre du livre (id)
+ * @returns 
+ */
+Livres.verifierExistenceGenre = (genre_id) => {
+    return new Promise((resolve, reject) => {
+        const requete = `select count(*) as count_genre from Genre g where g.id_genre = $1`;
+        const param_genre_id = [genre_id];
+
+        sql.query(requete, param_genre_id, (err, resultats) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            else {
+                resolve(resultats.rows[0].count_genre > 0);
+            }
+        });
+    })
+}
+
+/**
+ * Vérifie l'existence d'un type de livre dans la base de données
+ * @param {*} type_livre_id ID du type de livre
+ * @returns 
+ */
+Livres.verifierExsitenceTypelivre = (type_livre_id) => {
+    return new Promise((resolve, reject) => {
+        const requete = `select count(*) as count_typelivre from Type_livre t where t.id_type_livre = $1`;
+        const param_type_livre_id = [type_livre_id];
+
+        sql.query(requete, param_type_livre_id, (err, resultats) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            else {
+                resolve(resultats.rows[0].count_typelivre > 0);
+            }
+        });
+    })
+}
+
+
+
 
 
 
@@ -288,6 +334,34 @@ Livres.modifierStatutLivre = async (statutsEncodes, ISBN) => {
             }
             else {
                 console.log("Resultat statut livre", resultat.rows);
+                resolve(resultat.rows);
+            }
+        })
+    })
+}
+
+/**
+ * Ajoute un livre
+ * @param {*} titre Titre du livre
+ * @param {*} auteur Auteur du livre
+ * @param {*} genre_id id du genre du livre
+ * @param {*} date_publication date de publication du livre
+ * @param {*} nbre_pages Nombre de pages du livre
+ * @param {*} photo_URL URL de la photo du livre
+ * @param {*} type_livre_id Type du livre: roman, essai, etc.
+ * @returns 
+ */
+Livres.ajouterLivre = async (titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id) => {
+    return new Promise((resolve, reject) => {
+        const requete = `INSERT INTO Livre (titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, statut_livre, type_livre_id, is_favoris) VALUES ($1, $2, $3, $4, $5, $6, 'à lire', $7, FALSE)`;
+        const params = [titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id];
+
+        sql.query(requete, params, (erreur, resultat) => {
+            if (erreur) {
+                reject(erreur);
+            }
+            else {
+                console.log("Resultat ajout livre", resultat.rows);
                 resolve(resultat.rows);
             }
         })

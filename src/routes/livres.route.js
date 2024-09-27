@@ -23,6 +23,8 @@ router.delete('/bibli/:ISBN', livresController.retirerLivreBibli);
 
 //Modifier le statut d'un livre
 router.put('/', livresController.modifierStatutLivre);
+//Ajouter un livre
+router.post('/', livresController.ajouterLivre);
 
 //Modifier le statut d'un livre *****FAIT
 //Ajouter un livre à la bibliothèque personnelle *******FAIT
