@@ -301,7 +301,6 @@ exports.afficherFavoris = (req, res) => {
  */
 exports.afficherAppreciation = (req, res) => {
     const ISBN = parseInt(req.params.ISBN);
-    console.log(ISBN);
 
     if (!ISBN || ISBN <= 0 || isNaN(ISBN) || ISBN == undefined) {
         res.status(400).json;
@@ -312,10 +311,8 @@ exports.afficherAppreciation = (req, res) => {
         })
         return;
     }
-    console.log("hello");
     livresModel.verifierExistenceISBN(ISBN)
     .then((ISBN_existe) => {
-        console.log("verifierexistence", ISBN_existe);
         if (ISBN_existe == false || ISBN_existe <= 0) {
             res.status(404).json;
             res.send({
@@ -338,7 +335,6 @@ exports.afficherAppreciation = (req, res) => {
                 else {
                     livresModel.afficherAppreciation(ISBN)
                     .then((appreciation_resultat) => {                            
-                        console.log("appreciation resultat", appreciation_resultat);
                         if (!appreciation_resultat) {
                             res.status(404).json;
                             res.send({

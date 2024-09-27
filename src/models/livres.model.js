@@ -75,7 +75,7 @@ Livres.verifierAppreciation = (ISBN) => {
  */
 Livres.verifieStatutLivre = (ISBN) => {
     return new Promise((resolve, reject) => {
-        const requete = `select statut_livre from Livre l where l.ISBN = $1`;
+        const requete = `select l.statut_livre from Livre l where l.ISBN = $1`;
         const param_ISBN = [ISBN];
 
         sql.query(requete, param_ISBN, (err, resultats) => {
