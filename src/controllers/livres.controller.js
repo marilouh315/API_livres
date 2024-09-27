@@ -508,6 +508,8 @@ exports.modifierStatutLivre = (req, res) => {
         });
     }
 
+    console.log("statut encode dans controlller", statutsEncodes);
+
     livresModel.verifierExistenceISBN(ISBN)
     .then((ISBN_existe) => {
         if (ISBN_existe == false || ISBN_existe <= 0) {
