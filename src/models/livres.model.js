@@ -1,4 +1,4 @@
-const sql = require("../config/db_pg");
+const sql = require("../config/db_pg.js");
 
 const Livres = (livres) => {}
 
@@ -61,8 +61,8 @@ Livres.verifierAppreciation = (ISBN) => {
                 return;
             }
             else {
-                console.log("Resultat count appreciation", resultats[0].count_appreciation);
-                resolve(resultats.rows[0].count_appreciation > 0);
+                console.log("Resultat count appreciation", resultats.rows[0].count_appreciation);
+                //resolve(resultats.rows[0].count_appreciation > 0);
             }
         });
     })

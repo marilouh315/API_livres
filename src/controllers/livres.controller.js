@@ -312,9 +312,10 @@ exports.afficherAppreciation = (req, res) => {
         })
         return;
     }
-
+    console.log("hello");
     livresModel.verifierExistenceISBN(ISBN)
     .then((ISBN_existe) => {
+        console.log("verifierexistence", ISBN_existe);
         if (ISBN_existe == false || ISBN_existe <= 0) {
             res.status(404).json;
             res.send({
