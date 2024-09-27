@@ -474,7 +474,7 @@ exports.modifierStatutLivre = (req, res) => {
     } = req.body;
 
     const champsManquants = [];
-    let statutsEncodes;
+    let statutsEncodes = "";
 
     if (statut == 0) {
         statutsEncodes = "à lire";
