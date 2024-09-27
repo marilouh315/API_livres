@@ -118,7 +118,7 @@ Livres.verifierExistenceGenre = (genre_id) => {
  * @param {*} type_livre_id ID du type de livre
  * @returns 
  */
-Livres.verifierExsitenceTypelivre = (type_livre_id) => {
+Livres.verifierExistenceTypelivre = (type_livre_id) => {
     return new Promise((resolve, reject) => {
         const requete = `select count(*) as count_typelivre from Type_livre t where t.id_type_livre = $1`;
         const param_type_livre_id = [type_livre_id];

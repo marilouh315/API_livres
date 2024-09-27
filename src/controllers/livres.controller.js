@@ -701,7 +701,7 @@ exports.ajouterLivre = (req, res) => {
     if (!photo_URL) champsManquants.push("photo_URL");
 
     // Vérification du type du livre
-    livresModel.verifierExistenceTypeLivre(type_livre_id)
+    livresModel.verifierExistenceTypelivre(type_livre_id)
     .then((type_existe) => {
         if (!type_livre_id){
             champsManquants.push("type_livre_id");
