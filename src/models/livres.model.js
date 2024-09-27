@@ -84,7 +84,7 @@ Livres.verifieStatutLivre = (ISBN) => {
                 return;
             }
             else {
-                console.log("Resultat statut livre", resultats[0].statut_livre);
+                console.log("Resultat statut livre", resultats.rows[0].statut_livre);
                 resolve(resultats.rows[0].statut_livre);
             }
         });
