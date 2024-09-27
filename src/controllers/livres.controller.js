@@ -637,41 +637,43 @@ exports.ajouterLivre = (req, res) => {
     }
     
     // Vérification du genre_id
-    livresModel.verifierExistenceGenre(genre_id)
-    .then((genre_existe) => {
-        if (!genre_id){
-            champsManquants.push("genre_id");
-        }
-        else if (genre_existe <= 0 || !genre_existe) {
-            res.status(404).json;
+    if (!genre_id || isNaN(genre_id) || genre_id <= 0) {
+        champsManquants.push("genre_id");
+    }
+    else{
+        livresModel.verifierExistenceGenre(genre_id)
+        .then((genre_existe) => {
+            if (genre_existe <= 0 || !genre_existe) {
+                res.status(404).json;
+                res.send({
+                    erreur: `Données non trouvées.`,
+                    message: `Le genre avec l'ID ${genre_id} n'existe pas dans la base de données.`,
+                    genres_possibles : 
+                    `1: Fiction,
+                    2: Romance,
+                    3: Fantaisie,
+                    4: Horreur,
+                    5: Science-fiction,
+                    6: Biographie,
+                    7: Poésie,
+                    8: Mystère,
+                    9: Action,
+                    10: Policier,
+                    11: Psychologique,
+                    12: Informations`
+                })
+                return;
+            }
+        })
+        .catch((erreur) => {
+            console.log('Erreur : ', erreur);
+            res.status(500).json
             res.send({
-                erreur: `Données non trouvées.`,
-                message: `Le genre avec l'ID ${genre_id} n'existe pas dans la base de données.`,
-                genres_possibles : 
-                `1: Fiction,
-                2: Romance,
-                3: Fantaisie,
-                4: Horreur,
-                5: Science-fiction,
-                6: Biographie,
-                7: Poésie,
-                8: Mystère,
-                9: Action,
-                10: Policier,
-                11: Psychologique,
-                12: Informations`
-            })
-            return;
-        }
-    })
-    .catch((erreur) => {
-        console.log('Erreur : ', erreur);
-        res.status(500).json
-        res.send({
-            erreur: `Erreur serveur`,
-            message: "Erreur lors de la vérification du genre."
+                erreur: `Erreur serveur`,
+                message: "Erreur lors de la vérification du genre."
+            });
         });
-    });
+    }
 
     // Vérification de la date de publication (format YYYY-MM-DD)
     if (!date_publication || !dateRegex.test(date_publication)) {
@@ -701,37 +703,39 @@ exports.ajouterLivre = (req, res) => {
     if (!photo_URL) champsManquants.push("photo_URL");
 
     // Vérification du type du livre
-    livresModel.verifierExistenceTypelivre(type_livre_id)
-    .then((type_existe) => {
-        if (!type_livre_id){
-            champsManquants.push("type_livre_id");
-        }
-        else if (type_existe <= 0 || !type_existe) {
-            res.status(404).json;
+    if (!type_livre_id || isNaN(type_livre_id) || type_livre_id <= 0) {
+        champsManquants.push("type_livre_id");
+    }
+    else {    
+        livresModel.verifierExistenceTypelivre(type_livre_id)
+        .then((type_existe) => {
+            if (type_existe <= 0 || !type_existe) {
+                res.status(404).json;
+                res.send({
+                    erreur: `Données non trouvées.`,
+                    message: `Le type de livre avec l'ID ${type_livre_id} n'existe pas dans la base de données.`,
+                    types_possibles : 
+                    `1 Roman,
+                    2 Essai,
+                    3 Nouvelle,
+                    4 Bande-déssinée,
+                    5 Manga,
+                    6 Enfants,
+                    7 Manuel scolaire,
+                    8 Encyclopédie`
+                })
+                return;
+            }
+        })
+        .catch((erreur) => {
+            console.log('Erreur : ', erreur);
+            res.status(500).json
             res.send({
-                erreur: `Données non trouvées.`,
-                message: `Le type de livre avec l'ID ${type_livre_id} n'existe pas dans la base de données.`,
-                types_possibles : 
-                `1 Roman,
-                2 Essai,
-                3 Nouvelle,
-                4 Bande-déssinée,
-                5 Manga,
-                6 Enfants,
-                7 Manuel scolaire,
-                8 Encyclopédie`
-            })
-            return;
-        }
-    })
-    .catch((erreur) => {
-        console.log('Erreur : ', erreur);
-        res.status(500).json
-        res.send({
-            erreur: `Erreur serveur`,
-            message: "Erreur lors de la vérification du type de livre."
+                erreur: `Erreur serveur`,
+                message: "Erreur lors de la vérification du type de livre."
+            });
         });
-    });
+    }
 
     if (champsManquants.length > 0) {
         return res.status(400).json({

@@ -342,6 +342,7 @@ Livres.modifierStatutLivre = async (statutsEncodes, ISBN) => {
 
 /**
  * Ajoute un livre
+ * @param {*} ISBN ISBN du livre
  * @param {*} titre Titre du livre
  * @param {*} auteur Auteur du livre
  * @param {*} genre_id id du genre du livre
@@ -351,10 +352,11 @@ Livres.modifierStatutLivre = async (statutsEncodes, ISBN) => {
  * @param {*} type_livre_id Type du livre: roman, essai, etc.
  * @returns 
  */
-Livres.ajouterLivre = async (titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id) => {
+Livres.ajouterLivre = async (ISBN, titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id)=> {
     return new Promise((resolve, reject) => {
-        const requete = `INSERT INTO Livre (titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, statut_livre, type_livre_id, is_favoris) VALUES ($1, $2, $3, $4, $5, $6, 'à lire', $7, FALSE)`;
-        const params = [titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id];
+        const requete = `INSERT INTO Livre (ISBN, titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, statut_livre, type_livre_id, is_favoris) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, 'à lire', $8, FALSE)`;
+        const params = [ISBN, titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id];
 
         sql.query(requete, params, (erreur, resultat) => {
             if (erreur) {
