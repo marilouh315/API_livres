@@ -746,30 +746,50 @@ exports.ajouterLivre = (req, res) => {
     }
 
 /***FIN DES VALIDATIONS**************************************************************************** */
-
-    livresModel.ajouterLivre(ISBN, titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id)
-    .then((livre_ajoute) => {
-        if (!livre_ajoute) {
-            res.status(404).json;
+    livresModel.verifierExistenceISBN(ISBN)
+    .then((ISBN_existe) => {
+        if (ISBN_existe == true) {
+            res.status(409).json;
             res.send({
-                erreur: `Données non trouvées.`,
-                message: `Le livre n'a pas pu être ajouté.`
+                erreur: `Conflit d'envoi.`,
+                message: `Le livre avec l'ISBN ${ISBN} existe déjà dans la base de données.`
             })
             return;
         }
         else {
-            res.status(200).json({
-                message: `Le livre a été ajouté avec succès!`,
-                livre_ajoute: {
-                    ISBN: ISBN,
-                    titre: titre,
-                    auteur: auteur,
-                    genre_id: genre_id,
-                    date_publication: date_publication,
-                    nbre_pages: nbre_pages,
-                    photo_URL: photo_URL,
-                    type_livre_id: type_livre_id
+            livresModel.ajouterLivre(ISBN, titre, auteur, genre_id, date_publication, nbre_pages, photo_URL, type_livre_id)
+            .then((livre_ajoute) => {
+                if (!livre_ajoute) {
+                    res.status(404).json;
+                    res.send({
+                        erreur: `Données non trouvées.`,
+                        message: `Le livre n'a pas pu être ajouté.`
+                    })
+                    return;
                 }
+                else {
+                    res.status(200).json({
+                        message: `Le livre a été ajouté avec succès!`,
+                        livre_ajoute: {
+                            ISBN: ISBN,
+                            titre: titre,
+                            auteur: auteur,
+                            genre_id: genre_id,
+                            date_publication: date_publication,
+                            nbre_pages: nbre_pages,
+                            photo_URL: photo_URL,
+                            type_livre_id: type_livre_id
+                        }
+                    });
+                }
+            })
+            .catch((erreur) => {
+                console.log('Erreur : ', erreur);
+                res.status(500).json
+                res.send({
+                    erreur: `Erreur serveur`,
+                    message: "Erreur lors de l'ajout du livre."
+                });
             });
         }
     })
@@ -778,7 +798,8 @@ exports.ajouterLivre = (req, res) => {
         res.status(500).json
         res.send({
             erreur: `Erreur serveur`,
-            message: "Erreur lors de l'ajout du livre."
+            message: "Erreur lors de la vérification de l'ISBN."
         });
     });
+    
 }
