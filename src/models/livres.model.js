@@ -277,16 +277,17 @@ Livres.ajouterAppreciation = async (titre_appreciation, commentaire, nbre_etoile
  * @param {*} ISBN L'ISBN du livre
  * @returns 
  */
-Livres.modifierStatutLivre = async (statut, ISBN) => {
+Livres.modifierStatutLivre = async (statutsEncodes, ISBN) => {
     return new Promise((resolve, reject) => {
         const requete = `UPDATE Livre SET statut_livre = $1 WHERE ISBN = $1`;
-        const params = [statut, ISBN];
+        const params = [statutsEncodes, ISBN];
 
         sql.query(requete, params, (erreur, resultat) => {
             if (erreur) {
                 reject(erreur);
             }
             else {
+                console.log("Resultat statut livre", resultat.rows);
                 resolve(resultat.rows);
             }
         })
