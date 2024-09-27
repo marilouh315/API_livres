@@ -62,7 +62,7 @@ Livres.verifierAppreciation = (ISBN) => {
             }
             else {
                 console.log("Resultat count appreciation", resultats.rows[0].count_appreciation);
-                //resolve(resultats.rows[0].count_appreciation > 0);
+                resolve(resultats.rows[0].count_appreciation > 0);
             }
         });
     })

@@ -337,7 +337,8 @@ exports.afficherAppreciation = (req, res) => {
                 }
                 else {
                     livresModel.afficherAppreciation(ISBN)
-                    .then((appreciation_resultat) => {
+                    .then((appreciation_resultat) => {                            
+                        console.log("appreciation resultat", appreciation_resultat);
                         if (!appreciation_resultat) {
                             res.status(404).json;
                             res.send({
