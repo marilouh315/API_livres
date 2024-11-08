@@ -171,7 +171,7 @@ Livres.afficherTousLivres = async () => {
 Livres.afficherDetailsLivre = async (ISBN) => {
     return new Promise((resolve, reject) => {
         const requete = 
-        `select l.ISBN, l.titre, l.auteur, g.nom_genre, l.date_publication, l.nbre_pages, l.photo_URL, l.statut_livre, t.nom_genre, l.is_favoris from Genre g
+        `select l.ISBN, l.titre, l.auteur, g.nom_genre, l.date_publication, l.nbre_pages, l.photo_URL, l.statut_livre, t.nom_genre as nom_type_livre, l.is_favoris from Genre g
             inner join Livre l on g.id_genre = l.genre_id
             inner join Type_livre t on l.type_livre_id = t.id_type_livre 
             where l.ISBN = $1`;
@@ -196,7 +196,7 @@ Livres.afficherDetailsLivre = async (ISBN) => {
 Livres.afficherBibli = async => {
     return new Promise((resolve, reject) => {
         const requete = 
-        `select b.id_livre, l.titre, l.auteur, l.date_publication, l.statut_livre, l.is_favoris from livre l 
+        `select b.id_livre, l.titre, l.photo_url, l.auteur, l.date_publication, l.statut_livre, l.is_favoris from livre l 
             inner join bibliotheque b ON l.ISBN = b.id_livre`;
         sql.query(requete, (erreur, resultat) => {
             if (erreur) {
